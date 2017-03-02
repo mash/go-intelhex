@@ -270,8 +270,10 @@ func parseAfter(p *parser) parseStateFunc {
 			}
 		}
 	} else {
-		p.records <- *p.cumulativeDataRecord
-		p.cumulativeDataRecord = nil
+		if p.cumulativeDataRecord != nil {
+			p.records <- *p.cumulativeDataRecord
+			p.cumulativeDataRecord = nil
+		}
 
 		p.records <- *p.currentRecord
 		if p.currentRecord.Type == RecordTypeEOF {

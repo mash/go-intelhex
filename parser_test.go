@@ -27,6 +27,13 @@ var parseTestCases = []parseTestCase{
 		},
 		1,
 	},
+	{
+		":00000001FF\n",
+		[]Record{
+			{0, 0, RecordTypeEOF, ""},
+		},
+		1,
+	},
 }
 
 func TestParse(t *testing.T) {
