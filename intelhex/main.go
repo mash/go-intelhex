@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/landru29/intelhex/reader"
-	"github.com/landru29/intelhex/writer"
+	"github.com/mash/go-intelhex/intelhex/reader"
+	"github.com/mash/go-intelhex/intelhex/writer"
 )
 
 /* Main Command to parse
