@@ -222,7 +222,7 @@ func lexChecksum(l *lexer) lexStateFunc {
 }
 
 func lexNewline(l *lexer) lexStateFunc {
-	for l.accept("\n") {
+	for l.accept("\r\n") {
 		// loop all newlines
 	}
 	if l.next() == eof {
