@@ -1,16 +1,16 @@
 package reader
 
 import (
-	"bufio"
+	"encoding/hex"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
-	"encoding/hex"
 
+	"github.com/mash/go-intelhex"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/mash/go-intelhex"
 )
 
 func init() {
@@ -36,29 +36,26 @@ var MainCmd = &cobra.Command{
 		}
 		defer hexFile.Close()
 
-		scanner := bufio.NewScanner(hexFile)
-		for scanner.Scan() {
-			line := scanner.Text()
-			if line != ":00000001FF" && len(line) > 4 {
-				_, records := intelhex.ParseString(line)
-				for record := range records {
-					if viper.GetBool("binary") {
-						src := strings.ToLower(record.Data)
-						dst, err := hex.DecodeString(src)
-						if err != nil {
-							log.Fatal(err)
-						}
+		bytes, err := ioutil.ReadAll(hexFile)
+		if err != nil {
+			log.Fatal(err) //log.Fatal run an os.Exit
+		}
 
-						fmt.Printf("%s", dst)
-					} else {
-						fmt.Printf("%s\n", record.Data)
-					}
-
-					
+		_, records := intelhex.ParseString(string(bytes))
+		for record := range records {
+			if viper.GetBool("binary") {
+				src := strings.ToLower(record.Data)
+				dst, err := hex.DecodeString(src)
+				if err != nil {
+					log.Fatal(err)
 				}
+
+				fmt.Printf("%s", dst)
+			} else {
+				fmt.Printf("%s\n", record.Data)
 			}
 
-
 		}
+
 	},
 }
