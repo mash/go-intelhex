@@ -195,7 +195,7 @@ func parseStart(p *parser) parseStateFunc {
 	if !ok {
 		return p.errorf("ByteCount expected but got something else")
 	}
-	byteCount, err := strconv.ParseInt(byteCountString, 16, 8)
+	byteCount, err := strconv.ParseInt(byteCountString, 16, 16)
 	if err != nil {
 		return p.errorf("Failed to parse: %s", byteCountString)
 	}
@@ -213,7 +213,7 @@ func parseStart(p *parser) parseStateFunc {
 	if !ok {
 		return p.errorf("RecordType expected but got something else")
 	}
-	recordTyp, err := strconv.ParseInt(recordTypString, 16, 8)
+	recordTyp, err := strconv.ParseInt(recordTypString, 16, 16)
 	if err != nil {
 		return p.errorf("Failed to parse: %s", recordTypString)
 	}

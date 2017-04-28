@@ -175,7 +175,7 @@ func lexStartCode(l *lexer) lexStateFunc {
 func lexByteCount(l *lexer) lexStateFunc {
 	if l.acceptCount("0123456789ABCDEF", 2) {
 		byteCountString := l.input[l.start:l.pos]
-		byteCount, err := strconv.ParseInt(byteCountString, 16, 8)
+		byteCount, err := strconv.ParseInt(byteCountString, 16, 16)
 		if err != nil {
 			return l.errorf("Failed to parse: %s", byteCountString)
 		}
