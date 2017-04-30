@@ -56,7 +56,7 @@ type lexer struct {
 	pos       int        // current position in the input.
 	width     int        // width of last rune read from input.
 	fields    chan field // channel of scanned fields.
-	byteCount int64      // Intel Hex byte count in one line
+	byteCount uint8      // Intel Hex byte count in one line
 }
 
 type lexStateFunc func(*lexer) lexStateFunc
@@ -175,11 +175,11 @@ func lexStartCode(l *lexer) lexStateFunc {
 func lexByteCount(l *lexer) lexStateFunc {
 	if l.acceptCount("0123456789ABCDEF", 2) {
 		byteCountString := l.input[l.start:l.pos]
-		byteCount, err := strconv.ParseInt(byteCountString, 16, 8)
+		byteCount, err := strconv.ParseUint(byteCountString, 16, 8)
 		if err != nil {
 			return l.errorf("Failed to parse: %s", byteCountString)
 		}
-		l.byteCount = byteCount
+		l.byteCount = uint8(byteCount)
 		l.emit(fieldByteCount)
 		return lexAddress
 	}
@@ -206,7 +206,7 @@ func lexData(l *lexer) lexStateFunc {
 	if l.byteCount == 0 {
 		return lexChecksum
 	}
-	if l.acceptCount("0123456789ABCDEF", int(l.byteCount*2)) {
+	if l.acceptCount("0123456789ABCDEF", int(l.byteCount)*2) {
 		l.emit(fieldData)
 		return lexChecksum
 	}

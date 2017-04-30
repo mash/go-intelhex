@@ -31,8 +31,8 @@ type Record struct {
 	Data      string
 }
 
-// maxByteCount can be 16 or 32
-func (r *Record) Format(maxByteCount int64) []byte {
+// maxByteCount is usually 16 or 32, max 0xFF.
+func (r *Record) Format(maxByteCount uint8) []byte {
 	var b bytes.Buffer
 
 	switch r.Type {
@@ -41,18 +41,18 @@ func (r *Record) Format(maxByteCount int64) []byte {
 		var offset int64 = r.Address
 		for remainingByteCount > 0 {
 			var nextByteCount int64 = 0
-			if remainingByteCount > maxByteCount {
-				nextByteCount = maxByteCount
+			if remainingByteCount > int64(maxByteCount) {
+				nextByteCount = int64(maxByteCount)
 			} else {
 				nextByteCount = remainingByteCount
 			}
 			remainingByteCount -= nextByteCount
 
 			rec := Record{
-				nextByteCount,
-				offset,
-				RecordTypeData,
-				r.Data[offset*2 : (offset+nextByteCount)*2],
+				ByteCount: nextByteCount,
+				Address:   offset,
+				Type:      RecordTypeData,
+				Data:      r.Data[(offset-r.Address)*2 : (offset-r.Address+nextByteCount)*2],
 			}
 
 			fmt.Fprintf(&b, ":%02X%04X%02X%s%s\n",
@@ -79,7 +79,7 @@ func (r *Record) checksum() string {
 	sum += uint8(r.Type)
 	for i := 0; i < len(r.Data); i += 2 {
 		hexString := r.Data[i : i+2]
-		num, err := strconv.ParseInt(hexString, 16, 16)
+		num, err := strconv.ParseUint(hexString, 16, 8)
 		if err != nil {
 			return ""
 		}
@@ -195,7 +195,7 @@ func parseStart(p *parser) parseStateFunc {
 	if !ok {
 		return p.errorf("ByteCount expected but got something else")
 	}
-	byteCount, err := strconv.ParseInt(byteCountString, 16, 8)
+	byteCount, err := strconv.ParseUint(byteCountString, 16, 8)
 	if err != nil {
 		return p.errorf("Failed to parse: %s", byteCountString)
 	}
@@ -219,7 +219,7 @@ func parseStart(p *parser) parseStateFunc {
 	}
 
 	p.currentRecord = &Record{
-		byteCount,
+		int64(byteCount),
 		address,
 		RecordType(recordTyp),
 		"",
