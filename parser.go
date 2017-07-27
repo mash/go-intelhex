@@ -204,9 +204,9 @@ func parseStart(p *parser) parseStateFunc {
 	if !ok {
 		return p.errorf("Address expected but got something else")
 	}
-	address, err := strconv.ParseInt(addressString, 16, 16)
+	address, err := strconv.ParseUint(addressString, 16, 16)
 	if err != nil {
-		return p.errorf("Failed to parse: %s", addressString)
+		return p.errorf("Failed to parse address: %s, %s", addressString, err)
 	}
 
 	recordTypString, ok := p.acceptValue(fieldRecordType)
@@ -220,7 +220,7 @@ func parseStart(p *parser) parseStateFunc {
 
 	p.currentRecord = &Record{
 		int64(byteCount),
-		address,
+		int64(address),
 		RecordType(recordTyp),
 		"",
 	}

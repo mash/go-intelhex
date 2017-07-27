@@ -54,6 +54,14 @@ var parseTestCases = []parseTestCase{
 		1,
 		255,
 	},
+	{
+		":01FFFF00CB36\n", // max addr
+		[]Record{
+			{1, 65535, RecordTypeData, "CB"},
+		},
+		1,
+		32,
+	},
 }
 
 func TestParse(t *testing.T) {
